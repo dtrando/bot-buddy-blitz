@@ -162,7 +162,7 @@ export function handleEnemyMovement(scene, character){
     let davinky = scene.getObjectByName(character);
     let enemies = scene.enemies;
     let enemySpeed = 0.005*scene.score;  // make enemies get faster as you get a higher score
-    //if(enemySpeed>0.1) enemySpeed =0.09; // set maximum speed
+    if(enemySpeed>0.1) enemySpeed =0.09; // set maximum speed
     for (var i = 0; i < enemies.length; i++) {
         var enemy = enemies[i];
     
