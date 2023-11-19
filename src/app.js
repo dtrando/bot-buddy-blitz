@@ -7,20 +7,32 @@
  *
  */
 
-import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
-import { SeedScene } from 'scenes';
+import {
+    WebGLRenderer,
+    PerspectiveCamera,
+    Vector3
+} from 'three';
+import {
+    SeedScene
+} from 'scenes';
 import * as THREE from "three";
 
-import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
+import {
+    CSS3DRenderer
+} from 'three/examples/jsm/renderers/CSS3DRenderer.js';
 // Import the Object3D class
-import { Object3D } from 'three';
-import *  as handlers from './js/handlers.js';
+import {
+    Object3D
+} from 'three';
+import * as handlers from './js/handlers.js';
 
 
 // Initialize core ThreeJS components
 const scene = new SeedScene();
 const camera = new PerspectiveCamera();
-const renderer = new WebGLRenderer({ antialias: true });
+const renderer = new WebGLRenderer({
+    antialias: true
+});
 
 //// score display ///////////////////////////////////////
 // Create a new CSS3DRenderer instance
@@ -148,12 +160,15 @@ const onAnimationFrameHandler = (timeStamp) => {
     handlers.handlePaintSpawning(scene);
     handlers.handleCameraAngle(scene, character, camera);
     handlers.handleBoundaries(scene, character, sounds);
-  };
+};
 window.requestAnimationFrame(onAnimationFrameHandler);
 
 // Resize Handler
 const windowResizeHandler = () => {
-    const { innerHeight, innerWidth } = window;
+    const {
+        innerHeight,
+        innerWidth
+    } = window;
     renderer.setSize(innerWidth, innerHeight);
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
@@ -162,6 +177,3 @@ windowResizeHandler();
 window.addEventListener('resize', windowResizeHandler, false);
 window.addEventListener('keydown', event => handlers.handleKeyDown(event, keypress), false);
 window.addEventListener('keyup', event => handlers.handleKeyUp(event, keypress), false);
-
-
-
