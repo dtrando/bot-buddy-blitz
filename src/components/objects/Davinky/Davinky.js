@@ -1,6 +1,12 @@
-import { Group } from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
+import {
+    Group
+} from 'three';
+import {
+    GLTFLoader
+} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {
+    TWEEN
+} from 'three/examples/jsm/libs/tween.module.min.js';
 import MODEL from './davinky.gltf';
 
 class Davinky extends Group {
@@ -9,10 +15,10 @@ class Davinky extends Group {
         super();
         this.name = 'davinky';
         this.addDavinky();
-     }
+    }
 
     addDavinky() {
-        
+
         // Load object
         const loader = new GLTFLoader();
         loader.load(MODEL, (gltf) => {

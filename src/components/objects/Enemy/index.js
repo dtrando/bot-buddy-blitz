@@ -1,1 +1,4 @@
-export { default as Enemy } from './Enemy.js';
+export {
+    default as Enemy
+}
+from './Enemy.js';
