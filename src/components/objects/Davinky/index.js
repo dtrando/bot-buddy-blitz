@@ -1,1 +1,4 @@
-export { default as Davinky } from './Davinky.js';
+export {
+    default as Davinky
+}
+from './Davinky.js';

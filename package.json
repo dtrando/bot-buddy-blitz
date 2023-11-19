@@ -4,8 +4,7 @@
   "version": "1.0.0",
   "title": "Bot Buddy Blitz",
   "description": "final project for apc 524. minigame",
-  "keywords": [
-  ],
+  "keywords": [],
   "scripts": {
     "start": "webpack-dev-server --mode development --output-public-path \"\"",
     "prebuild": "rimraf ./build && mkdirp ./build",
@@ -14,7 +13,10 @@
     "deploy": "npm run prebuild && webpack --mode production --progress && gh-pages -d build"
   },
   "dependencies": {
+    "chai": "^4.3.10",
     "dat.gui": "^0.7.9",
+    "mocha": "^10.2.0",
+    "save-dev": "0.0.1-security",
     "three": "^0.147.0",
     "three-obj-loader": "^1.1.3"
   },

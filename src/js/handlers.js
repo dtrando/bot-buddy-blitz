@@ -1,7 +1,10 @@
 import * as THREE from "three";
-import { Vector2, Vector3 } from "three";
+import {
+    Vector2,
+    Vector3
+} from "three";
 
-// maintan booleans to keep track if buffer period is active and if 
+// maintain booleans to keep track if buffer period is active and if 
 // game is muted
 let buffer = false;
 let mute = false;
@@ -11,18 +14,18 @@ let timer;
 
 // handle user controls input
 export function handleKeyDown(event, keypress) {
-    if (event.key == "ArrowUp"    || event.key == 'w') keypress['up']    = true;
-    if (event.key == "ArrowDown"  || event.key == 's') keypress['down']  = true;
-    if (event.key == "ArrowLeft"  || event.key == 'a') keypress['left']  = true;
+    if (event.key == "ArrowUp" || event.key == 'w') keypress['up'] = true;
+    if (event.key == "ArrowDown" || event.key == 's') keypress['down'] = true;
+    if (event.key == "ArrowLeft" || event.key == 'a') keypress['left'] = true;
     if (event.key == "ArrowRight" || event.key == 'd') keypress['right'] = true;
     if (event.key == ' ') keypress['space'] = true;
 }
 
 // terminate the action caused by user controls input
 export function handleKeyUp(event, keypress) {
-    if (event.key == "ArrowUp"    || event.key == 'w') keypress['up']    = false;
-    if (event.key == "ArrowDown"  || event.key == 's') keypress['down']  = false;
-    if (event.key == "ArrowLeft"  || event.key == 'a') keypress['left']  = false;
+    if (event.key == "ArrowUp" || event.key == 'w') keypress['up'] = false;
+    if (event.key == "ArrowDown" || event.key == 's') keypress['down'] = false;
+    if (event.key == "ArrowLeft" || event.key == 'a') keypress['left'] = false;
     if (event.key == "ArrowRight" || event.key == 'd') keypress['right'] = false;
     if (event.key == ' ') keypress['space'] = false;
 }
@@ -41,7 +44,7 @@ export function handleCharacterControls(scene, keypress, character, camera, soun
 
     if (keypress['up'] && davinky.position.y < 20) {
         davinky.position.x -= delta;
-        davinky.rotation.y = Math.PI;        
+        davinky.rotation.y = Math.PI;
     }
     if (keypress['down']) {
         davinky.position.x += delta;
@@ -55,7 +58,7 @@ export function handleCharacterControls(scene, keypress, character, camera, soun
         davinky.position.z += delta;
         davinky.rotation.y = -Math.PI / 2;
     }
-    if(keypress['space'] && !jumping) {
+    if (keypress['space'] && !jumping) {
         velocity.y += jumpHeight;
         jumping = true;
         sounds['jump1'].play();
@@ -93,28 +96,27 @@ export function handleBoundaries(scene, character, sounds) {
 }
 
 // implement first person camera view
-export function handleCameraAngle(scene, character, camera){
-    if(scene.state.FirstPerson){
+export function handleCameraAngle(scene, character, camera) {
+    if (scene.state.FirstPerson) {
         let davinky = scene.getObjectByName(character);
         camera.position.copy(davinky.position);
-        camera.position.y +=2;
+        camera.position.y += 2;
         const direction = new THREE.Vector3();
         davinky.getWorldDirection(direction);
-        const newDirect = new THREE.Vector3(0, 0,-1);
+        const newDirect = new THREE.Vector3(0, 0, -1);
         // Set the camera's quaternion to match the character's direction vector
         const targetOrientation = new THREE.Quaternion();
         targetOrientation.setFromUnitVectors(new THREE.Vector3(1, 0, 0), direction);
-        camera.quaternion.slerp(targetOrientation, 0.05);    
-    }
-    else{
+        camera.quaternion.slerp(targetOrientation, 0.05);
+    } else {
         camera.position.set(35, 25, 0);
         camera.lookAt(new Vector3(0, 0, 0));
     }
-    
+
 }
 
 // handle collisions with enemies
-export function handleUnitCollision(scene, character, sounds){
+export function handleUnitCollision(scene, character, sounds) {
     let davinky = scene.getObjectByName(character);
 
     var potentialColliders = scene.enemies;
@@ -133,9 +135,9 @@ export function handleUnitCollision(scene, character, sounds){
         if (davinkyBB.intersectsBox(enemiesBB[i])) {
             scene.remove(potentialColliders[i]);
             scene.enemies.splice(i, 1);
-            scene.score -=1;
+            scene.score -= 1;
             const scoreElement = document.getElementById('score');
-            scoreElement.innerHTML = 'Score: ' + (scene.score*(scene.state.FirstPerson ? 2 : 1)+1*scene.state.rotationSpeed).toFixed(2);
+            scoreElement.innerHTML = 'Score: ' + (scene.score * (scene.state.FirstPerson ? 2 : 1) + 1 * scene.state.rotationSpeed).toFixed(2);
             sounds['hurt1'].play();
         }
     }
@@ -151,51 +153,51 @@ export function handleUnitCollision(scene, character, sounds){
             scene.paintBuckets.splice(i, 1);
             scene.score += 1;
             const scoreElement = document.getElementById('score');
-            scoreElement.innerHTML = 'Score: ' + (scene.score*(scene.state.FirstPerson ? 2 : 1)+1*scene.state.rotationSpeed).toFixed(2);
+            scoreElement.innerHTML = 'Score: ' + (scene.score * (scene.state.FirstPerson ? 2 : 1) + 1 * scene.state.rotationSpeed).toFixed(2);
             sounds['splash1'].play();
         }
     }
 }
 
 // Moves enemies positions towards Davinky
-export function handleEnemyMovement(scene, character){
+export function handleEnemyMovement(scene, character) {
     let davinky = scene.getObjectByName(character);
     let enemies = scene.enemies;
-    let enemySpeed = 0.005*scene.score;  // make enemies get faster as you get a higher score
+    let enemySpeed = 0.005 * scene.score; // make enemies get faster as you get a higher score
     //if(enemySpeed>0.1) enemySpeed =0.09; // set maximum speed
     for (var i = 0; i < enemies.length; i++) {
         var enemy = enemies[i];
-    
+
         // Move the enemy towards the player
         var direction = new THREE.Vector3().subVectors(davinky.position, enemy.position).normalize();
         direction.y = 0;
         enemy.lookAt(davinky.position);
         enemy.position.add(direction.multiplyScalar(enemySpeed));
-        
-      }
+
+    }
 }
 
 // Spawns more enemies on screen
-export function handleEnemySpawning(scene){
+export function handleEnemySpawning(scene) {
     let enemies = scene.enemies;
     let numEnemies = enemies.length;
     let maxEnemies = scene.score;
-    if(numEnemies < maxEnemies) {
+    if (numEnemies < maxEnemies) {
         scene.spawnEnemies(1);
     }
 }
 
 // spawn paint balls
-export function handlePaintSpawning(scene){
+export function handlePaintSpawning(scene) {
     let paintBuckets = scene.paintBuckets;
     let numBuckets = paintBuckets.length;
     let maxBuckets = 7;
-    if(numBuckets < maxBuckets) {
+    if (numBuckets < maxBuckets) {
         scene.spawnPaint(1);
     }
 }
 
-export function handleCursor(scene, mouse, camera, cursor){
+export function handleCursor(scene, mouse, camera, cursor) {
     let enemies = scene.enemies;
     // Function to update the game state
 
@@ -213,13 +215,11 @@ export function handleCursor(scene, mouse, camera, cursor){
 
     // ******this line of code needs the enemies bounding boxes--not the enemies itself
     const intersects = raycaster.intersectObjects(enemies);
-  
+
     // If the cursor is intersecting with an enemy, remove it from the scene
     if (intersects.length > 0) {
-      scene.remove(intersects[0].object);
-      enemies.splice(enemies.indexOf(intersects[0].object), 1);
+        scene.remove(intersects[0].object);
+        enemies.splice(enemies.indexOf(intersects[0].object), 1);
     }
-  
+
 }
-
-
