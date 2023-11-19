@@ -1,5 +1,9 @@
-import { Group } from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {
+    Group
+} from 'three';
+import {
+    GLTFLoader
+} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import MODEL from './land.gltf';
 
 class Land extends Group {
