@@ -15,48 +15,10 @@
             margin: 0px auto;
             margin-top: 20px;
         }
-
-        /* Add CSS styles for the start menu */
-        .start-menu {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            background-color: #fff;
-            padding: 20px;
-            border: 2px solid #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .start-menu h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .start-menu button {
-            padding: 10px 20px;
-            font-size: 18px;
-            background-color: #1589FF;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
     </style>
 
 <body>
 
-    <!-- Add the start menu -->
-    <div class="start-menu">
-        <h1>Welcome to Bot Buddy Blitz!</h1>
-        <button onclick="startGame(1)">Easy</button>
-        <br><br>
-        <button onclick="startGame(2)">Medium</button>
-        <br><br>
-        <button onclick="startGame(3)">Hard</button>
-    </div>
 
 
     <!-- playing field -->
@@ -64,43 +26,17 @@
     <script>
         var canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
-        var ball_speed = 10;
-        var xspeed_ball = 0;
-        var yspeed_ball = 0;
         var op_score = 0;
         var player_score = 0;
         var x_min = 30;
         var x_max = 600;
         var y_min = 60;
         var y_max = 460;
+        var ball_speed = 10;
+        var xspeed_ball = 0;
+        var yspeed_ball = 0;
         var active = false;
         var enemy_strength = 2;
-
-        function startGame(difficulty) {
-            // hide start menu
-            document.querySelector('.start-menu').style.display = 'none';
-
-            document.addEventListener("mousemove", mouseMoveHandler, false);
-            // document.addEventListener("keydown", keyDownHandler, false);
-
-            active = true;
-
-            enemy_strength = difficulty;
-
-            // start game logic
-            setInterval(play, 10);
-        }
-
-        function options() {
-
-            // show options menu
-            document.querySelector('.options-menu').style.display = 'block';
-        }
-
-        function closeOptions() {
-            // hide options menu
-            document.querySelector('.options-menu').style.display = 'none';
-        }
 
         function draw_rect(x, y, w, h, b) {
             ctx.beginPath();
@@ -140,6 +76,7 @@
         function draw_filled_circle(x, y, r, d) {
             ctx.beginPath();
             ctx.arc(x, y, r, 0, Math.PI * 2);
+    
             if (d == 1) // user
             {
                 ctx.fillStyle = "#50c878";
@@ -157,7 +94,6 @@
                 ctx.fillStyle = "#ffffff";
                 ctx.strokeStyle = "#000000";
             }
-
             ctx.fill();
             ctx.lineWidth = 3;
 
@@ -205,6 +141,8 @@
             ctx.strokeText(op_score, 370, 100);
             ctx.strokeText(player_score, 270, 100);
         }
+        draw_board();
+        
 
         // mallet class
         var mallet = function(x, y, r) {
@@ -212,7 +150,6 @@
             this.y = y;
             this.radius = r;
         }
-
         // create mallets
         var player = new mallet(530, 360, 20); 
         var teammate = new mallet(530, 160, 20);
@@ -228,20 +165,6 @@
         // create ball 
         var ball = new ball(canvas.width / 2, canvas.height / 2, 10);
 
-        // function to control player using keyboard
-        function keyDownHandler(e) {
-            if (e.key === "w" || e.key === "W") {
-                player.y -= 10;
-            } else if (e.key === "s" || e.key === "S") {
-                player.y += 10;
-            } else if (e.key === "a" || e.key === "A") {
-                player.x -= 10;
-            } else if (e.key === "d" || e.key === "D") {
-                player.x += 10;
-            }
-        }
-
-        // function to control player using cursor
         function mouseMoveHandler(e) {
             var relativeX = e.clientX - canvas.offsetLeft;
             var relativeY = e.clientY - canvas.offsetTop;
@@ -254,6 +177,8 @@
                 player.y = relativeY;
             }
         }
+
+        document.addEventListener("mousemove", mouseMoveHandler, false);
 
         function play() {
 
@@ -268,6 +193,14 @@
             // have ball bounce off left-right walls
             if (ball.x > canvas.width - 45 || ball.x + xspeed_ball < 45) {
                 xspeed_ball *= -1;
+            }
+
+             
+            // have ball bounce off top-bottom walls
+            else {
+                if (ball.y + yspeed_ball > canvas.height - 45 || ball.y + yspeed_ball < 45) {
+                    yspeed_ball *= -1;
+                }
             }
 
             // goal logic
@@ -285,14 +218,7 @@
                     yspeed_ball = 0;
                     player_score = player_score + 1;
                 }
-            } 
-            // have ball bounce off top-bottom walls
-            else {
-                if (ball.y + yspeed_ball > canvas.height - 45 || ball.y + yspeed_ball < 45) {
-                    yspeed_ball *= -1;
-                }
             }
-
 
             var error = enemy_strength * 3; // noise for ai accuracy
             var op_strafe = enemy_strength; // opponent strafe speed
@@ -372,6 +298,7 @@
                 enemy_y_movement(opponent2);
             }
 
+            
             // player bounds
             if (player.x < x_min + 30) {
                 player.x = x_min + 30;
@@ -445,6 +372,7 @@
                     tempy *= tempy;
                     return Math.sqrt(tempx + tempy);
                 }
+
                 dist = distance(mallet.x, mallet.y, ball.x, ball.y);
                 if (dist < 30) {
                     var dx = ball.x - mallet.x;
@@ -474,10 +402,10 @@
 
             xspeed_ball *= 0.995;
             yspeed_ball *= 0.995;
-        }
-
+            }
+            
+        active = true;
         setInterval(play, 10);
-    
     </script>
 </body>
 </head>
