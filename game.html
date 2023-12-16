@@ -155,12 +155,34 @@
         // create ball 
         var ball = new ball(canvas.width / 2, canvas.height / 2, 10);
 
+        function mouseMoveHandler(e) {
+            var relativeX = e.clientX - canvas.offsetLeft;
+            var relativeY = e.clientY - canvas.offsetTop;
 
-        draw_filled_circle(player.x, player.y, player.radius, 1);
-        draw_filled_circle(teammate.x, teammate.y, teammate.radius, 2)
-        draw_filled_circle(opponent1.x, opponent1.y, opponent1.radius, 3);
-        draw_filled_circle(opponent2.x, opponent2.y, opponent2.radius, 3);
-        draw_filled_circle(ball.x, ball.y, ball.radius, 0);
+            if (relativeX > 60 && relativeX < canvas.width - 60) {
+                player.x = relativeX;
+            }
+            //360
+            if (relativeY > 0 && relativeY < 600) {
+                player.y = relativeY;
+            }
+        }
+
+        document.addEventListener("mousemove", mouseMoveHandler, false);
+
+        function play() {
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            draw_board();
+            draw_filled_circle(player.x, player.y, player.radius, 1);
+            draw_filled_circle(teammate.x, teammate.y, teammate.radius, 2)
+            draw_filled_circle(opponent1.x, opponent1.y, opponent1.radius, 3);
+            draw_filled_circle(opponent2.x, opponent2.y, opponent2.radius, 3);
+            draw_filled_circle(ball.x, ball.y, ball.radius, 0);
+
+        }
+        
+        setInterval(play, 10);
     </script>
 </body>
 </head>
