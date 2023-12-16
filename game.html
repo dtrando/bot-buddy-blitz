@@ -26,6 +26,8 @@
     <script>
         var canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
+        var op_score = 0;
+        var player_score = 0;
 
         function draw_rect(x, y, w, h, b) {
             ctx.beginPath();
@@ -109,6 +111,11 @@
             ctx.lineTo(630, 330);
             ctx.stroke();
             ctx.closePath();
+
+            ctx.font = "50px Pristina";
+            ctx.lineWidth = 2
+            ctx.strokeText(op_score, 370, 100);
+            ctx.strokeText(player_score, 270, 100);
         }
         draw_board();
         // ball class
