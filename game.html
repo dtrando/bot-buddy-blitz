@@ -15,10 +15,48 @@
             margin: 0px auto;
             margin-top: 20px;
         }
+
+        /* Add CSS styles for the start menu */
+        .start-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border: 2px solid #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .start-menu h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .start-menu button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #1589FF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 
 <body>
 
+    <!-- Add the start menu -->
+    <div class="start-menu">
+        <h1>Welcome to Bot Buddy Blitz!</h1>
+        <button onclick="startGame(1)">Easy</button>
+        <br><br>
+        <button onclick="startGame(2)">Medium</button>
+        <br><br>
+        <button onclick="startGame(3)">Hard</button>
+    </div>
 
 
     <!-- playing field -->
@@ -26,15 +64,43 @@
     <script>
         var canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
+        var ball_speed = 10;
+        var xspeed_ball = 0;
+        var yspeed_ball = 0;
         var op_score = 0;
         var player_score = 0;
         var x_min = 30;
         var x_max = 600;
         var y_min = 60;
         var y_max = 460;
-        var ball_speed = 10;
-        var xspeed_ball = 0;
-        var yspeed_ball = 0;
+        var active = false;
+        var enemy_strength = 2;
+
+        function startGame(difficulty) {
+            // hide start menu
+            document.querySelector('.start-menu').style.display = 'none';
+
+            document.addEventListener("mousemove", mouseMoveHandler, false);
+            // document.addEventListener("keydown", keyDownHandler, false);
+
+            active = true;
+
+            enemy_strength = difficulty;
+
+            // start game logic
+            setInterval(play, 10);
+        }
+
+        function options() {
+
+            // show options menu
+            document.querySelector('.options-menu').style.display = 'block';
+        }
+
+        function closeOptions() {
+            // hide options menu
+            document.querySelector('.options-menu').style.display = 'none';
+        }
 
         function draw_rect(x, y, w, h, b) {
             ctx.beginPath();
@@ -74,7 +140,6 @@
         function draw_filled_circle(x, y, r, d) {
             ctx.beginPath();
             ctx.arc(x, y, r, 0, Math.PI * 2);
-    
             if (d == 1) // user
             {
                 ctx.fillStyle = "#50c878";
@@ -92,6 +157,7 @@
                 ctx.fillStyle = "#ffffff";
                 ctx.strokeStyle = "#000000";
             }
+
             ctx.fill();
             ctx.lineWidth = 3;
 
@@ -139,8 +205,6 @@
             ctx.strokeText(op_score, 370, 100);
             ctx.strokeText(player_score, 270, 100);
         }
-        draw_board();
-        
 
         // mallet class
         var mallet = function(x, y, r) {
@@ -148,6 +212,7 @@
             this.y = y;
             this.radius = r;
         }
+
         // create mallets
         var player = new mallet(530, 360, 20); 
         var teammate = new mallet(530, 160, 20);
@@ -163,6 +228,20 @@
         // create ball 
         var ball = new ball(canvas.width / 2, canvas.height / 2, 10);
 
+        // function to control player using keyboard
+        function keyDownHandler(e) {
+            if (e.key === "w" || e.key === "W") {
+                player.y -= 10;
+            } else if (e.key === "s" || e.key === "S") {
+                player.y += 10;
+            } else if (e.key === "a" || e.key === "A") {
+                player.x -= 10;
+            } else if (e.key === "d" || e.key === "D") {
+                player.x += 10;
+            }
+        }
+
+        // function to control player using cursor
         function mouseMoveHandler(e) {
             var relativeX = e.clientX - canvas.offsetLeft;
             var relativeY = e.clientY - canvas.offsetTop;
@@ -175,8 +254,6 @@
                 player.y = relativeY;
             }
         }
-
-        document.addEventListener("mousemove", mouseMoveHandler, false);
 
         function play() {
 
@@ -191,14 +268,6 @@
             // have ball bounce off left-right walls
             if (ball.x > canvas.width - 45 || ball.x + xspeed_ball < 45) {
                 xspeed_ball *= -1;
-            }
-
-             
-            // have ball bounce off top-bottom walls
-            else {
-                if (ball.y + yspeed_ball > canvas.height - 45 || ball.y + yspeed_ball < 45) {
-                    yspeed_ball *= -1;
-                }
             }
 
             // goal logic
@@ -216,8 +285,93 @@
                     yspeed_ball = 0;
                     player_score = player_score + 1;
                 }
+            } 
+            // have ball bounce off top-bottom walls
+            else {
+                if (ball.y + yspeed_ball > canvas.height - 45 || ball.y + yspeed_ball < 45) {
+                    yspeed_ball *= -1;
+                }
             }
-            
+
+
+            var error = enemy_strength * 3; // noise for ai accuracy
+            var op_strafe = enemy_strength; // opponent strafe speed
+            var tm_strafe = 2; // teammate strafe speed
+
+            if (active == true) {
+
+                // x movement for teammate
+                if ((Math.abs(yspeed_ball) + Math.abs(xspeed_ball)) < 10 && ball.x >= canvas.width / 2) { 
+                    if (ball.x - 20 > teammate.x - error) {
+                        teammate.x += 2;
+                    } else {
+                        teammate.x -= 2;
+                    }
+                } else if (teammate.x > 100 - error) {
+                    teammate.x -= 2;
+                } else if (opponent1.x < 100 - error) {
+                    teammate.x += 2;
+                }
+
+                function enemy_x_movement(mallet){
+                    if ((Math.abs(yspeed_ball) + Math.abs(xspeed_ball)) < 10 && ball.x <= canvas.width / 2) { 
+                        if (ball.x - 20 > mallet.x - error) {
+                            mallet.x += 2;
+                        } else {
+                            mallet.x -= 2;
+                        }
+                    } else if (mallet.x > 100 - error) {
+                        mallet.x -= 2;
+                    } else if (mallet.x < 100 - error) {
+                        mallet.x += 2;
+                    }
+                }
+
+                // x movement for opponent1
+                enemy_x_movement(opponent1);
+
+                // x movement for opponent2
+                enemy_x_movement(opponent2);
+
+                // have teammate try to stay behind ball
+                if (ball.x > teammate.x && ball.y > teammate.y - 30 && ball.y < teammate.y + 30) {
+                    tm_strafe = +2;
+                }
+
+                function enemy_ball_tracking(mallet){
+                    // have opponent try to stay behind ball
+                    if (ball.x < mallet.x && ball.y > mallet.y - 30 && ball.y < mallet.y + 30) {
+                        op_strafe = -2;
+                    }
+                }
+                // have opponent1 try to stay behind ball
+                enemy_ball_tracking(opponent1);
+                // have opponent2 try to stay behind ball
+                enemy_ball_tracking(opponent2);
+
+                // y movement for teammate
+                if (teammate.y < ball.y + error) {
+                    teammate.y += op_strafe;
+                }
+                if (teammate.y > ball.y - error) {
+                    teammate.y -= op_strafe;
+                }
+
+                function enemy_y_movement(mallet){
+                    // y movement for opponent
+                    if (mallet.y < ball.y + error) {
+                        mallet.y += op_strafe;
+                    }
+                    if (mallet.y > ball.y - error) {
+                        mallet.y -= op_strafe;
+                    }
+                }
+                // y movement for opponent1
+                enemy_y_movement(opponent1);
+                // y movement for opponent2
+                enemy_y_movement(opponent2);
+            }
+
             // player bounds
             if (player.x < x_min + 30) {
                 player.x = x_min + 30;
@@ -230,6 +384,48 @@
             }
             if (player.y > y_max) {
                 player.y = y_max;
+            }
+
+            // teammate bounds
+            if (teammate.x < canvas.width/2 + 150) {
+                teammate.x = canvas.width/2 + 150;
+            }
+            if (teammate.x > x_max - 20) {
+                teammate.x = x_max - 20;
+            }
+            if (teammate.y < y_min + 30) {
+                teammate.y = y_min + 30;
+            }
+            if (teammate.y > y_max - 30) {
+                teammate.y = y_max - 30;
+            }
+
+            // opponent1 bounds
+            if (opponent1.x < x_min + 35) {
+                opponent1.x = x_min + 35;
+            }
+            if (opponent1.x > x_max - 30) {
+                opponent1.x = x_max - 30;
+            }
+            if (opponent1.y > y_max - 15) {
+                opponent1.y = y_max - 15;
+            }
+            if (opponent1.y < canvas.height/2 + 25) {
+                opponent1.y = canvas.height/2 + 25;
+            }
+
+            // opponent2 bounds
+            if (opponent2.x < x_min + 35) {
+                opponent2.x = x_min + 35;
+            }
+            if (opponent2.x > x_max - 30) {
+                opponent2.x = x_max - 30;
+            }
+            if (opponent2.y < y_min + 30) {
+                opponent2.y = y_min + 30;
+            }
+            if (opponent2.y > canvas.height/2 - 25) {
+                opponent2.y = canvas.height/2 - 25;
             }
 
             // ball bounds
@@ -249,7 +445,6 @@
                     tempy *= tempy;
                     return Math.sqrt(tempx + tempy);
                 }
-
                 dist = distance(mallet.x, mallet.y, ball.x, ball.y);
                 if (dist < 30) {
                     var dx = ball.x - mallet.x;
@@ -264,16 +459,25 @@
             // player-ball interaction
             mallet_ball_interaction(player);
 
+            // teammate-ball interaction
+            mallet_ball_interaction(teammate);
+
+            // opponent1-ball interaction
+            mallet_ball_interaction(opponent1);
+
+            // opponent2 ball interaction
+            mallet_ball_interaction(opponent2);
+
             // ball physics
             ball.x += xspeed_ball;
             ball.y += yspeed_ball;
 
             xspeed_ball *= 0.995;
             yspeed_ball *= 0.995;
-            }
-            
+        }
 
-        setInterval(play, 1/1000);
+        setInterval(play, 10);
+    
     </script>
 </body>
 </head>
