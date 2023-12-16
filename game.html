@@ -15,17 +15,18 @@
             margin: 0px auto;
             margin-top: 20px;
         }
-        
     </style>
 
 <body>
-    
+
+
+
     <!-- playing field -->
     <canvas id="canvas" width="660" height="520"></canvas>
     <script>
         var canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
-        
+
         function draw_rect(x, y, w, h, b) {
             ctx.beginPath();
             if (b) {
@@ -57,6 +58,20 @@
             ctx.lineWidth = w;
             ctx.arc(x, y, r, 0, Math.PI * 2, false);
             ctx.strokeStyle = "#ffffff";
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function draw_ball(x, y, r) {
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+    
+            ctx.fillStyle = "#ffffff";
+            ctx.strokeStyle = "#000000";
+
+            ctx.fill();
+            ctx.lineWidth = 3;
+
             ctx.stroke();
             ctx.closePath();
         }
@@ -94,11 +109,15 @@
             ctx.lineTo(630, 330);
             ctx.stroke();
             ctx.closePath();
-
         }
-
         draw_board();
-
+        // ball class
+        var ball = function(x, y, r) {
+            this.x = x;
+            this.y = y;
+            this.radius = r;
+        }
+        draw_ball(canvas.width / 2, canvas.height / 2, 10);
     </script>
 </body>
 </head>
