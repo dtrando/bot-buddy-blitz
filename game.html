@@ -64,13 +64,27 @@
             ctx.closePath();
         }
 
-        function draw_ball(x, y, r) {
+        function draw_filled_circle(x, y, r, d) {
             ctx.beginPath();
             ctx.arc(x, y, r, 0, Math.PI * 2);
     
-            ctx.fillStyle = "#ffffff";
-            ctx.strokeStyle = "#000000";
-
+            if (d == 1) // user
+            {
+                ctx.fillStyle = "#50c878";
+                ctx.strokeStyle = "#afe1af";
+            } else if (d == 2) // teammate
+            {
+                ctx.fillStyle = "#0096ff";
+                ctx.strokeStyle = "#89cff0";
+            } else if (d == 3) // opponents
+            {
+                ctx.fillStyle = "#d2042d";
+                ctx.strokeStyle = "#ee4b2b";
+            } else // ball
+            {
+                ctx.fillStyle = "#ffffff";
+                ctx.strokeStyle = "#000000";
+            }
             ctx.fill();
             ctx.lineWidth = 3;
 
@@ -112,19 +126,41 @@
             ctx.stroke();
             ctx.closePath();
 
+            // scores
             ctx.font = "50px Pristina";
             ctx.lineWidth = 2
             ctx.strokeText(op_score, 370, 100);
             ctx.strokeText(player_score, 270, 100);
         }
         draw_board();
+        
+        // mallet class
+        var mallet = function(x, y, r) {
+            this.x = x;
+            this.y = y;
+            this.radius = r;
+        }
+        // create mallets
+        var player = new mallet(530, 360, 20); 
+        var teammate = new mallet(530, 160, 20);
+        var opponent1 = new mallet(130, 360, 20);
+        var opponent2 = new mallet(130, 160, 20);
+
         // ball class
         var ball = function(x, y, r) {
             this.x = x;
             this.y = y;
             this.radius = r;
         }
-        draw_ball(canvas.width / 2, canvas.height / 2, 10);
+        // create ball 
+        var ball = new ball(canvas.width / 2, canvas.height / 2, 10);
+
+
+        draw_filled_circle(player.x, player.y, player.radius, 1);
+        draw_filled_circle(teammate.x, teammate.y, teammate.radius, 2)
+        draw_filled_circle(opponent1.x, opponent1.y, opponent1.radius, 3);
+        draw_filled_circle(opponent2.x, opponent2.y, opponent2.radius, 3);
+        draw_filled_circle(ball.x, ball.y, ball.radius, 0);
     </script>
 </body>
 </head>
